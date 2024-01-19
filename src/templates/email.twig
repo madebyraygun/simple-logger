@@ -13,7 +13,7 @@
     <div class="email" style="padding: 22px;">
         <!-- start content -->
 
-        <h4>{{ 'Simple Logger Report'|t }} | {{ siteName ?? '' }}</h4>
+        <h4>{{ 'Website Exceptions'|t }}</h4>
 
         <br><br>
 
@@ -34,16 +34,13 @@
                     {# <td>{{ log.code }}</td> #}
                     <td>{{ log.level_name }}</td>
                     <td>{{ log.sourcetype }}</td>
-                    <td>{{ log.message }}</td>
+                    <td><pre>{{ log.message|slice(0, 1000) }}...<pre></td>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
 
         <br>
-
-        <small><a href="https://plugins.craftcms.com/simple-logger?craft4">{{ 'by Simple Logger' }}</a></small>
-
         <!-- end content -->
     </div>
 </div>

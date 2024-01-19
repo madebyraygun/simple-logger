@@ -43,7 +43,7 @@ class SimpleHandler extends AbstractProcessingHandler
                 //"level" => $record["level"],
                 "sourcetype" => "Exception " . $record["level"],
                 "level_name" => $record["level_name"],
-                "message" => stripslashes(substr($record["message"], 0, strpos($record["message"], "\nStack")))
+                "message" => stripslashes(substr($record["message"], 0))
             ]
         );
     }
