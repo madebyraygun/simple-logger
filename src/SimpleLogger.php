@@ -17,6 +17,7 @@ use craft\events\ExceptionEvent;
 use craft\events\RegisterTemplateRootsEvent;
 use craft\helpers\App;
 use craft\web\ErrorHandler;
+use craft\helpers\Json;
 use craft\web\View;
 use leowebguy\simplelogger\services\LoggerService;
 use yii\base\Event;
@@ -52,6 +53,9 @@ class SimpleLogger extends Plugin
             ErrorHandler::class,
             ErrorHandler::EVENT_BEFORE_HANDLE_EXCEPTION,
             function(ExceptionEvent $event) {
+                // How frequently to send reports
+                $hours = intval(App::env('LOGGER_HOURS')) ?: 24;
+
 
                 // Only if active
                 if (!App::env('LOGGER_ON')) {
@@ -66,25 +70,17 @@ class SimpleLogger extends Plugin
                 // Write Log Exception
                 $this->loggerService->handleException($event->exception);
 
-                // Test only
-                //$this->loggerService->sendReport();
+                $logfile = Craft::$app->path->getLogPath() . '/simplelogger.json';
+                $json = @file_get_contents($logfile);
+                $records = Json::decode($json);
+                $oldest = $records[0];
 
-                // Write text for email one time a day
-                $logfile = Craft::$app->path->getLogPath() . '/simplelogger';
+                $currentTimestamp = time();
+                $logTimestamp = strtotime($oldest['time']);
 
-                if (!@file_exists($logfile)) {
-                    @file_put_contents($logfile, '.');
-                }
-
-                $date = date("Y-m-d H:i:s");
-                $dayLog = date('d', filemtime($logfile));
-                $currentDay = date("d", strtotime($date));
-                $hourDay = ltrim(date("h", strtotime($date)), '0');
-
-                // Check if there's new data, if next day and after 8am
-                if (@file_exists($logfile) && ($currentDay > $dayLog && $hourDay > 8)) {
+                // Check if there's new data, if it's been at least $hours since the last report
+                if (($currentTimestamp - $logTimestamp >= $hours * 60 * 60)) {
                     $this->loggerService->sendReport();
-                    @file_put_contents($logfile, '.');
                 }
             }
         );
