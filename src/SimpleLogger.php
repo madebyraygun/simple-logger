@@ -62,8 +62,8 @@ class SimpleLogger extends Plugin
                     return;
                 }
 
-                // Skip non-critical exceptions
-                if (preg_match("/(NotFoundHttpException)/i", $event->exception)) {
+                //Discard any status codes between 400 and 499
+                if ($event->exception->statusCode >= 400 && $event->exception->statusCode < 500) {
                     return;
                 }
 
