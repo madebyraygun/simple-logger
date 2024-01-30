@@ -63,7 +63,7 @@ class SimpleLogger extends Plugin
                 }
 
                 //Discard any status codes between 400 and 499
-                if ($event->exception->statusCode >= 400 && $event->exception->statusCode < 500) {
+                if ( isset($event->exception->statusCode) && $event->exception->statusCode >= 400 && $event->exception->statusCode < 500) {
                     return;
                 }
 
